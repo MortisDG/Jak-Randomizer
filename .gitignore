@@ -8,7 +8,7 @@ data/out/*
 appicon.png
 data/log/compiler.txt
 *.exe
-!resources/gk.exe
-!resources/goalc.exe
-!resources/extractor.exe
+!gk.exe
+!goalc.exe
+!extractor.exe
 resources/data/log/compiler.txt
