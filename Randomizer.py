@@ -47,7 +47,7 @@ command_names = [
     "deload","quickcam","dark","nodax","lowpoly",
     "resetactors", "widejak","flatjak","smalljak","bigjak",
     "slippery","rocketman","unzoom","bighead","smallhead","bigfist",
-    "bigheadnpc","hugehead","mirror","notex", "flutspeed"
+    "bigheadnpc","hugehead","mirror","notex", "flutspeed", "nuka",
 ]
 
 # Initialize the current_effect variable
@@ -144,8 +144,8 @@ sendForm("(send-event *target* 'get-pickup (pickup-type eco-red) 5.0)")
 sendForm("(dotimes (i 1) (sound-play-by-name (static-sound-name \"cell-prize\") (new-sound-id) 1024 0 0 (sound-group sfx) #t))")
 sendForm("(set! *cheat-mode* #f)")
 sendForm("(set! *debug-segment* #f)")
+sendForm("(initialize! *game-info* 'game (the-as game-save #f)")
 #putting an on/off variable here for the while loop didn't work :(
-
 # End Int block
 
 # Split GK commands into args for gk.exe
@@ -193,6 +193,7 @@ effect_mapping = {
     37: "mirror",
     38: "notex",
     39: "drown",
+    40: "nuka",
 }
 
 # Number of effects to apply
@@ -214,6 +215,7 @@ def apply_effect(effects):
         effect_name = effect_mapping.get(effect_num)
         if effect_name and active[command_names.index(effect_name)]:
             print("Deactivating:", effect_name)
+            # Deactivate previous effect(s)
             execute_deactivation(effect_name)
 
     # Apply selected effects
@@ -221,8 +223,15 @@ def apply_effect(effects):
         effect_name = effect_mapping.get(effect_num)
         if effect_name:
             print("Applying:", effect_name)
+            # Write new effects in "effect.txt" and replace the old ones
+            with open("effect.txt", "r") as file:
+                lines = file.readlines()
+            lines.append("current effect: " + effect_name + "\n")
+            if len(lines) > 3:
+                lines = lines[-3:]
             with open("effect.txt", "w") as file:
-                file.write("current effect: " + effect_name + "\n")
+                file.writelines(lines)
+            # Activate new effect(s)
             execute_activation(effect_name)
 
 def value_changer(cstring):
@@ -343,7 +352,6 @@ def execute_activation(effect_name):
         sendForm("(set! (-> *game-info* current-continue) (get-continue-by-name *game-info* \"training-start\"))")
         message = ""
     elif effect_name == "dark" and on_check("dark"):
-        sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-finalboss)")
         sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-darkcave)")
         message = ""
     elif effect_name == "nodax" and on_check("nodax"):
@@ -399,6 +407,9 @@ def execute_activation(effect_name):
         message = ""
     elif effect_name == "drown" and on_check("drown"):
         sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'drown-death))")
+        message = ""
+    elif effect_name == "nuka" and on_check("nuka"):
+        sendForm("(begin (logior! (-> *target* state-flags) (state-flags dying)))")
         message = ""
 
 
@@ -477,10 +488,9 @@ def execute_deactivation(effect_name):
         time.sleep(0.1)
         sendForm("(set! (-> *game-info* current-continue) (get-continue-by-name *game-info* \"training-start\"))")
         message = ""
-    # elif effect_name == "dark" and on_check("dark"):
-    #     sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-finalboss)")
-    #     sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-darkcave)")
-    #     message = ""
+    elif effect_name == "dark" and on_check("dark"):
+        sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-finalboss)")
+        message = ""
     elif effect_name == "nodax" and on_check("nodax"):
         sendForm("(send-event *target* 'sidekick #f)")
         message = ""
@@ -506,7 +516,7 @@ def execute_deactivation(effect_name):
         sendForm("(set! (-> *stone-surface* slope-slip-angle) 8192.0)(set! (-> *stone-surface* slip-factor) 1.0)(set! (-> *stone-surface* transv-max) 1.0)(set! (-> *stone-surface* turnv) 1.0)(set! (-> *stone-surface* nonlin-fric-dist) 5120.0)(set! (-> *stone-surface* fric) 153600.0)")
         message = ""
     elif effect_name == "rocketman" and on_check("rocketman"):
-        sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters 60.0))(start 'play (get-or-create-continue! *game-info*))")
+        sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters 100.0))(start 'play (get-or-create-continue! *game-info*))")
         message = ""
     elif effect_name == "unzoom" and on_check("unzoom"):
         sendForm("(send-event *target* 'no-look-around (seconds 0.1))")
@@ -537,6 +547,9 @@ def execute_deactivation(effect_name):
         message = ""
     elif effect_name == "drown" and on_check("drown"):
         sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'drown-death))")
+        message = ""
+    elif effect_name == "nuka" and on_check("nuka"):
+        sendForm("(logiclear! (-> *target* state-flags) (state-flags dying)))")
         message = ""
 
 
