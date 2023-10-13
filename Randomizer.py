@@ -48,6 +48,7 @@ command_names = [
     "resetactors", "widejak","flatjak","smalljak","bigjak",
     "slippery","rocketman","unzoom","bighead","smallhead","bigfist",
     "bigheadnpc","hugehead","mirror","notex", "flutspeed", "nuka",
+    "highgrav",
 ]
 
 # Initialize the current_effect variable
@@ -150,6 +151,7 @@ sendForm("(set! *cheat-mode* #f)")
 sendForm("(set! *debug-segment* #f)")
 sendForm("(initialize! *game-info* 'game (the-as game-save #f) \"game-start\")")
 sendForm("(set! (-> *setting-control* default play-hints) #f)")
+sendForm("(set! (-> *pc-settings* speedrunner-mode?) #f)")
 # End Int block
 
 # Split GK commands into args for gk.exe
@@ -198,6 +200,7 @@ effect_mapping = {
     38: "notex",
     39: "drown",
     40: "nuka",
+    41: "highgrav"
 }
 
 # Number of effects to apply
@@ -271,6 +274,9 @@ def value_changer(cstring):
     elif cstring == "unzoom":
         random_value = random.randint(1, 120)
         command = "(send-event *target* 'no-look-around (seconds {}))".format(random_value)
+    elif cstring == "highgrav":
+        random_value = random.randint(100, 200)
+        command = "(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters {}))(start 'play (get-or-create-continue! *game-info*))".format(random_value)
     print(command)
     return command
 
@@ -365,7 +371,7 @@ def execute_activation(effect_name):
         message = ""
     elif effect_name == "quickcam" and on_check("quickcam"):
         activate("quickcam")
-        sendForm("stop 'debug)(start 'play (get-or-create-continue! *game-info*))")
+        sendForm("(stop 'debug)(start 'play (get-or-create-continue! *game-info*))")
         time.sleep(0.1)
         sendForm("(set! (-> *game-info* current-continue) (get-continue-by-name *game-info* \"training-start\"))")
         message = ""
@@ -407,7 +413,7 @@ def execute_activation(effect_name):
         message = ""
     elif effect_name == "rocketman" and on_check("rocketman"):
         activate("rocketman")
-        sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters -60.0))(start 'play (get-or-create-continue! *game-info*))")
+        sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters -5.0))(start 'play (get-or-create-continue! *game-info*))")
         message = ""
     elif effect_name == "unzoom" and on_check("unzoom"):
         activate("unzoom")
@@ -415,31 +421,31 @@ def execute_activation(effect_name):
         message = ""
     elif effect_name == "bighead" and on_check("bighead"):
         activate("bighead")
-        sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats big-head)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats big-head)))")
+        sendForm("(logior! (-> *pc-settings* cheats) (pc-cheats big-head))")
         message = ""
     elif effect_name == "smallhead" and on_check("smallhead"):
         activate("smallhead")
-        sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats small-head)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats small-head)))")
+        sendForm("(logior! (-> *pc-settings* cheats) (pc-cheats small-head))")
         message = ""
     elif effect_name == "bigfist" and on_check("bigfist"):
         activate("bigfist")
-        sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats big-fist)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats big-fist)))")
+        sendForm("(logior! (-> *pc-settings* cheats) (pc-cheats big-fist))")
         message = ""
     elif effect_name == "bigheadnpc" and on_check("bigheadnpc"):
         activate("bigheadnpc")
-        sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats big-head-npc)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats big-head-npc)))")
+        sendForm("(logior! (-> *pc-settings* cheats) (pc-cheats big-head-npc))")
         message = ""
     elif effect_name == "hugehead" and on_check("hugehead"):
         activate("hugehead")
-        sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats huge-head)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats huge-head)))")
+        sendForm("(logior! (-> *pc-settings* cheats) (pc-cheats huge-head))")
         message = ""
     elif effect_name == "mirror" and on_check("mirror"):
         activate("mirror")
-        sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats mirror)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats mirror)))")
+        sendForm("(logior! (-> *pc-settings* cheats) (pc-cheats mirror))")
         message = ""
     elif effect_name == "notex" and on_check("notex"):
         activate("notex")
-        sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats no-tex)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats no-tex)))")
+        sendForm("(logior! (-> *pc-settings* cheats) (pc-cheats no-tex))")
         message = ""
     elif effect_name == "drown" and on_check("drown"):
         activate("drown")
@@ -447,8 +453,11 @@ def execute_activation(effect_name):
         message = ""
     elif effect_name == "nuka" and on_check("nuka"):
         activate("nuka")
-        sendForm("(begin (logior! (-> *target* state-flags) (state-flags dying)))")
+        sendForm("(logior! (-> *target* state-flags) (state-flags dying))")
         message = ""
+    elif effect_name == "highgrav" and on_check("highgrav"):
+        activate("highgrav")
+        sendForm(value_changer("highgrav"))
 
 
 # Deactivate the previous effects
@@ -540,7 +549,7 @@ def execute_deactivation(effect_name):
         message = ""
     elif effect_name == "quickcam" and on_check("quickcam"):
         deactivate("quickcam")
-        sendForm("stop 'debug)(start 'play (get-or-create-continue! *game-info*))")
+        sendForm("(stop 'debug)(start 'play (get-or-create-continue! *game-info*))")
         time.sleep(0.1)
         sendForm("(set! (-> *game-info* current-continue) (get-continue-by-name *game-info* \"training-start\"))")
         message = ""
@@ -582,7 +591,7 @@ def execute_deactivation(effect_name):
         message = ""
     elif effect_name == "rocketman" and on_check("rocketman"):
         deactivate("rocketman")
-        sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters 100.0))(start 'play (get-or-create-continue! *game-info*))")
+        sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters 60.0))(start 'play (get-or-create-continue! *game-info*))")
         message = ""
     elif effect_name == "unzoom" and on_check("unzoom"):
         deactivate("unzoom")
@@ -624,6 +633,9 @@ def execute_deactivation(effect_name):
         deactivate("nuka")
         sendForm("(logiclear! (-> *target* state-flags) (state-flags dying)))")
         message = ""
+    elif effect_name == "highgrav" and on_check("highgrav"):
+        deactivate("highgrav")
+        sendForm(value_changer("highgrav"))
 
 
 while True:
