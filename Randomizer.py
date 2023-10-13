@@ -635,7 +635,7 @@ def execute_deactivation(effect_name):
         message = ""
     elif effect_name == "highgrav" and on_check("highgrav"):
         deactivate("highgrav")
-        sendForm(value_changer("highgrav"))
+        sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters 60.0))(start 'play (get-or-create-continue! *game-info*))")
 
 
 while True:
