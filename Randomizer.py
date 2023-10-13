@@ -137,15 +137,19 @@ time.sleep(1)
 data = clientSocket.recv(1024)
 print(data.decode())
 
+
 # Int block these commands are sent on startup
 sendForm("(lt)")
+start_time = time.time()
 sendForm("(mi)")
+while time.time() - start_time < 40:
+    time.sleep(1)
 sendForm("(send-event *target* 'get-pickup (pickup-type eco-red) 5.0)")
 sendForm("(dotimes (i 1) (sound-play-by-name (static-sound-name \"cell-prize\") (new-sound-id) 1024 0 0 (sound-group sfx) #t))")
 sendForm("(set! *cheat-mode* #f)")
 sendForm("(set! *debug-segment* #f)")
-sendForm("(initialize! *game-info* 'game (the-as game-save #f)")
-#putting an on/off variable here for the while loop didn't work :(
+sendForm("(initialize! *game-info* 'game (the-as game-save #f) \"game-start\")")
+sendForm("(set! (-> *setting-control* default play-hints) #f)")
 # End Int block
 
 # Split GK commands into args for gk.exe
@@ -199,13 +203,9 @@ effect_mapping = {
 # Number of effects to apply
 num_effects_to_apply = 3
 
-total_duration = 40
+total_duration = 45
 start_time = time.time()
-interval = 1 * 40  # 5 minutes 
-#elapsed_time = time.time() - start_time
-#with open("timer.txt", "w") as file:
-#        file.write(str(round(elapsed_time, 2)))
-#        time.sleep(1)
+interval = 1 * 45  # 5 minutes
 
 def apply_effect(effects):
     random_effect = random.sample(range(1, len(effect_mapping) + 1), effects)
@@ -258,7 +258,7 @@ def value_changer(cstring):
         command = "(set! (-> *TARGET-bank* double-jump-height-min) (meters {}))".format(random_value)
     elif cstring == "flutspeed":
         random_value = random.randint(1, 20)
-        command = "(set! (-> *flut-walk-mods* target-speed) (meters {}))".format(random_value)
+        command =   "(set! (logtest? (-> *target* control root-prim prim-core action) (collide-action flut))(set! (-> *flut-walk-mods* target-speed) (meters {})))".format(random_value)
     elif cstring == "sucksuck1":
         random_value = random.randint(1, 50)
         command = "(set! (-> *FACT-bank* suck-suck-dist) (meters {}))".format(random_value)
@@ -295,120 +295,158 @@ def execute_activation(effect_name):
         sendForm("(set! (-> *edge-surface* fric) 1.0)")
         message = ""
     elif effect_name == "noboosteds" and on_check("noboosteds"):
+        activate("noboosteds")
         sendForm("(set! (-> *edge-surface* fric) 1530000.0)")
         message = ""
     elif effect_name == "nojumps" and on_check("nojumps"):
+        activate("nojumps")
         sendForm("(logior! (-> *target* state-flags) (state-flags prevent-jump))",)
         message = ""
     elif effect_name == "fastjak" and on_check("fastjak"):
+        activate("fastjak")
         sendForm("(set! (-> *walk-mods* target-speed) 77777.0)(set! (-> *double-jump-mods* target-speed) 77777.0)(set! (-> *jump-mods* target-speed) 77777.0)(set! (-> *jump-attack-mods* target-speed) 77777.0)(set! (-> *attack-mods* target-speed) 77777.0)(set! (-> *forward-high-jump-mods* target-speed) 77777.0)(set! (-> *jump-attack-mods* target-speed) 77777.0)(set! (-> *stone-surface* target-speed) 1.25)")
         message = ""
     elif effect_name == "slowjak" and on_check("slowjak"):
+        activate("slowjak")
         sendForm("(send-event *target* 'reset-pickup 'eco)(set! (-> *walk-mods* target-speed) 20000.0)(set! (-> *double-jump-mods* target-speed) 20000.0)(set! (-> *jump-mods* target-speed) 20000.0)(set! (-> *jump-attack-mods* target-speed) 20000.0)(set! (-> *attack-mods* target-speed) 20000.0)(set! (-> *stone-surface* target-speed) 1.0)(set! (-> *TARGET-bank* wheel-flip-dist) (meters 0))")
         message = ""
     elif effect_name == "pacifist" and on_check("pacifist"):
+        activate("pacifist")
         sendForm("(set! (-> *TARGET-bank* punch-radius) (meters -1.0))(set! (-> *TARGET-bank* spin-radius) (meters -1.0))(set! (-> *TARGET-bank* flop-radius) (meters -1.0))(set! (-> *TARGET-bank* uppercut-radius) (meters -1.0))")
         message = ""
     elif effect_name == "trip" and on_check("trip"):
+        activate("trip")
         sendForm("(send-event *target* 'loading)")
         message = ""
     elif effect_name == "shortfall" and on_check("shortfall"):
+        activate("shortfall")
         sendForm("(set! (-> *TARGET-bank* fall-far) (meters 2.5))(set! (-> *TARGET-bank* fall-far-inc) (meters 3.5))")
         message = ""
     elif effect_name == "ghostjak" and on_check("ghostjak"):
+        activate("ghostjak")
         sendForm("(set! (-> *TARGET-bank* body-radius) (meters -1.0))")
         message = ""
     elif effect_name == "flutspeed" and on_check("flutspeed"):
+        activate("flutspeed")
         sendForm(value_changer("flutspeed"))
         message = ""
     elif effect_name == "sucksuck" and on_check("sucksuck"):
+        activate("sucksuck")
         sendForm(value_changer("sucksuck1"))
         sendForm(value_changer("sucksuck2"))
         message = ""
     elif effect_name == "noeco" and on_check("noeco"):
+        activate("noeco")
         sendForm("(send-event *target* 'reset-pickup 'eco)(set! (-> *FACT-bank* eco-full-timeout) (seconds 0.0))")
         message = ""
     elif effect_name == "die" and on_check("die"):
+        activate("die")
         sendForm("(when (not (movie?))(initialize! *game-info* 'die (the-as game-save #f) (the-as string #f)))")
         message = ""
     elif effect_name == "ouch" and on_check("ouch"):
+        activate("ouch")
         sendForm("(if (not (= *target* #f))(send-event *target* 'attack #t (new 'static 'attack-info)))")
         message = ""
     elif effect_name == "burn" and on_check("burn"):
+        activate("burn")
         sendForm("(if (not (= *target* #f))(target-attack-up *target* 'attack 'burnup))")
         message = ""
     elif effect_name == "endlessfall" and on_check("endlessfall"):
+        activate("endlessfall")
         sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'endlessfall))")
         message = ""
     elif effect_name == "iframes" and on_check("iframes"):
+        activate("iframes")
         sendForm(value_changer("iframes"))
         message = ""
     elif effect_name == "deload" and on_check("deload"):
+        activate("deload")
         sendForm("(when (not (movie?))(set! (-> *load-state* want 0 display?) #f))")
         message = ""
     elif effect_name == "quickcam" and on_check("quickcam"):
+        activate("quickcam")
         sendForm("stop 'debug)(start 'play (get-or-create-continue! *game-info*))")
         time.sleep(0.1)
         sendForm("(set! (-> *game-info* current-continue) (get-continue-by-name *game-info* \"training-start\"))")
         message = ""
     elif effect_name == "dark" and on_check("dark"):
-        sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-darkcave)")
+        activate("dark")
+        sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-finalboss)")
         message = ""
     elif effect_name == "nodax" and on_check("nodax"):
+        activate("nodax")
         sendForm("(send-event *target* 'sidekick #f)")
         message = ""
     elif effect_name == "lowpoly" and on_check("lowpoly"):
+        activate("lowpoly")
         sendForm("(set! (-> *pc-settings* lod-force-tfrag) 2)(set! (-> *pc-settings* lod-force-tie) 3)(set! (-> *pc-settings* lod-force-ocean) 2)(set! (-> *pc-settings* lod-force-actor) 3)")
         message = ""
     elif effect_name == "resetactors" and on_check("resetactors"):
+        activate("resetactors")
         sendForm("(reset-actors 'debug)")
         message = ""
     elif effect_name == "widejak" and on_check("widejak"):
+        activate("widejak")
         sendForm("(set! (-> (-> (the-as target *target* )root)scale x) 4.0)(set! (-> (-> (the-as target *target* )root)scale y) 1.0)(set! (-> (-> (the-as target *target* )root)scale z) 1.0)")
         message = ""
     elif effect_name == "flatjak" and on_check("flatjak"):
+        activate("flatjak")
         sendForm("(set! (-> (-> (the-as target *target* )root)scale x) 1.3)(set! (-> (-> (the-as target *target* )root)scale y) 0.2)(set! (-> (-> (the-as target *target* )root)scale z) 1.3)")
         message = ""
     elif effect_name == "smalljak" and on_check("smalljak"):
+        activate("smalljak")
         sendForm("(set! (-> (-> (the-as target *target* )root)scale x) 0.4)(set! (-> (-> (the-as target *target* )root)scale y) 0.4)(set! (-> (-> (the-as target *target* )root)scale z) 0.4)(set! (-> *TARGET-bank* wheel-flip-dist) (meters 43.25))")
         message = ""
     elif effect_name == "bigjak" and on_check("bigjak"):
+        activate("bigjak")
         sendForm("(set! (-> (-> (the-as target *target* )root)scale x) 2.7)(set! (-> (-> (the-as target *target* )root)scale y) 2.7)(set! (-> (-> (the-as target *target* )root)scale z) 2.7)")
         message = ""
     elif effect_name == "slippery" and on_check("slippery"):
+        activate("slippery")
         sendForm("(set! (-> *stone-surface* slope-slip-angle) 16384.0)(set! (-> *stone-surface* slip-factor) 0.7)(set! (-> *stone-surface* transv-max) 1.5)(set! (-> *stone-surface* transv-max) 1.5)(set! (-> *stone-surface* turnv) 0.5)(set! (-> *stone-surface* nonlin-fric-dist) 4091904.0)(set! (-> *stone-surface* fric) 23756.8)")
         message = ""
     elif effect_name == "rocketman" and on_check("rocketman"):
+        activate("rocketman")
         sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters -60.0))(start 'play (get-or-create-continue! *game-info*))")
         message = ""
     elif effect_name == "unzoom" and on_check("unzoom"):
+        activate("unzoom")
         sendForm(value_changer("unzoom"))
         message = ""
     elif effect_name == "bighead" and on_check("bighead"):
+        activate("bighead")
         sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats big-head)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats big-head)))")
         message = ""
     elif effect_name == "smallhead" and on_check("smallhead"):
+        activate("smallhead")
         sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats small-head)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats small-head)))")
         message = ""
     elif effect_name == "bigfist" and on_check("bigfist"):
+        activate("bigfist")
         sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats big-fist)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats big-fist)))")
         message = ""
     elif effect_name == "bigheadnpc" and on_check("bigheadnpc"):
+        activate("bigheadnpc")
         sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats big-head-npc)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats big-head-npc)))")
         message = ""
     elif effect_name == "hugehead" and on_check("hugehead"):
+        activate("hugehead")
         sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats huge-head)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats huge-head)))")
         message = ""
     elif effect_name == "mirror" and on_check("mirror"):
+        activate("mirror")
         sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats mirror)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats mirror)))")
         message = ""
     elif effect_name == "notex" and on_check("notex"):
+        activate("notex")
         sendForm("(begin (logior! (-> *pc-settings* cheats) (pc-cheats no-tex)) (logclear! (-> *pc-settings* cheats-known) (pc-cheats no-tex)))")
         message = ""
     elif effect_name == "drown" and on_check("drown"):
+        activate("drown")
         sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'drown-death))")
         message = ""
     elif effect_name == "nuka" and on_check("nuka"):
+        activate("nuka")
         sendForm("(begin (logior! (-> *target* state-flags) (state-flags dying)))")
         message = ""
 
@@ -433,122 +471,157 @@ def execute_deactivation(effect_name):
         sendForm("(set! (-> *edge-surface* fric) 30720.0)")
         message = ""
     elif effect_name == "noboosteds" and on_check("noboosteds"):
+        deactivate("noboosteds")
         sendForm("(set! (-> *edge-surface* fric) 30720.0)")
         message = ""
     elif effect_name == "nojumps" and on_check("nojumps"):
+        deactivate("nojumps")
         sendForm("(logclear! (-> *target* state-flags) (state-flags prevent-jump))")
         message = ""
     elif effect_name == "fastjak" and on_check("fastjak"):
+        deactivate("fastjak")
         sendForm("(set! (-> *walk-mods* target-speed) 40960.0)(set! (-> *double-jump-mods* target-speed) 32768.0)(set! (-> *jump-mods* target-speed) 40960.0)(set! (-> *jump-attack-mods* target-speed) 24576.0)(set! (-> *attack-mods* target-speed) 40960.0)(set! (-> *forward-high-jump-mods* target-speed) 45056.0)(set! (-> *jump-attack-mods* target-speed) 24576.0)(set! (-> *stone-surface* target-speed) 1.0)")
         message = ""
     elif effect_name == "slowjak" and on_check("slowjak"):
+        deactivate("slowjak")
         sendForm("(send-event *target* 'reset-pickup 'eco)(set! (-> *walk-mods* target-speed) 20000.0)(set! (-> *double-jump-mods* target-speed) 20000.0)(set! (-> *jump-mods* target-speed) 20000.0)(set! (-> *jump-attack-mods* target-speed) 20000.0)(set! (-> *attack-mods* target-speed) 20000.0)(set! (-> *stone-surface* target-speed) 1.0)(set! (-> *TARGET-bank* wheel-flip-dist) (meters 0))")
         message = ""
     elif effect_name == "pacifist" and on_check("pacifist"):
+        deactivate("pacifist")
         sendForm("(set! (-> *TARGET-bank* punch-radius) (meters 1.3))(set! (-> *TARGET-bank* spin-radius) (meters 2.2))(set! (-> *TARGET-bank* flop-radius) (meters 1.4))(set! (-> *TARGET-bank* uppercut-radius) (meters 1))")
     elif effect_name == "trip" and on_check("trip"):
+        deactivate("trip")
         sendForm("(send-event *target* 'loading)")
         message = ""
     elif effect_name == "shortfall" and on_check("shortfall"):
+        deactivate("shortfall")
         sendForm("(set! (-> *TARGET-bank* fall-far) (meters 30))(set! (-> *TARGET-bank* fall-far-inc) (meters 20))")
         message = ""
     elif effect_name == "ghostjak" and on_check("ghostjak"):
+        deactivate("ghostjak")
         sendForm("(set! (-> *TARGET-bank* body-radius) (meters 0.7))")
         message = ""
     elif effect_name == "flutspeed" and on_check("flutspeed"):
-        sendForm("(set! (-> *flut-walk-mods* target-speed) (meters 20.0))")
+        deactivate("flutspeed")
+        sendForm("(set! (logtest? (-> *target* control root-prim prim-core action) (collide-action flut))(set! (-> *flut-walk-mods* target-speed) (meters 20.0))")
         message = ""
     elif effect_name == "sucksuck" and on_check("sucksuck"):
+        deactivate("sucksuck")
         sendForm("(set! (-> *FACT-bank* suck-suck-dist) (meters 5.0)")
         sendForm("(set! (-> *FACT-bank* suck-bounce-dist) (meters 5.0)")
         message = ""
     elif effect_name == "noeco" and on_check("noeco"):
+        deactivate("noeco")
         sendForm("(set! (-> *FACT-bank* eco-full-timeout) (seconds 20.0))")
         message = ""
     elif effect_name == "die" and on_check("die"):
+        deactivate("die")
         sendForm("(when (not (movie?))(initialize! *game-info* 'die (the-as game-save #f) (the-as string #f)))")
         message = ""
     elif effect_name == "ouch" and on_check("ouch"):
+        deactivate("ouch")
         sendForm("(if (not (= *target* #f))(send-event *target* 'attack #t (new 'static 'attack-info)))")
         message = ""
     elif effect_name == "burn" and on_check("burn"):
+        deactivate("burn")
         sendForm("(if (not (= *target* #f))(target-attack-up *target* 'attack 'burnup))")
         message = ""
     elif effect_name == "endlessfall" and on_check("endlessfall"):
+        deactivate("endlessfall")
         sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'endlessfall))")
         message = ""
     elif effect_name == "iframes" and on_check("iframes"):
+        deactivate("iframes")
         sendForm("(set! (-> *TARGET-bank* hit-invulnerable-timeout) (seconds 0))")
         message = ""
     elif effect_name == "deload" and on_check("deload"):
+        deactivate("deload")
         sendForm("(when (not (movie?))(set! (-> *load-state* want 0 display?) #f))")
         message = ""
     elif effect_name == "quickcam" and on_check("quickcam"):
+        deactivate("quickcam")
         sendForm("stop 'debug)(start 'play (get-or-create-continue! *game-info*))")
         time.sleep(0.1)
         sendForm("(set! (-> *game-info* current-continue) (get-continue-by-name *game-info* \"training-start\"))")
         message = ""
     elif effect_name == "dark" and on_check("dark"):
-        sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-finalboss)")
+        deactivate("dark")
+        sendForm("(set! (-> (level-get-target-inside *level*) mood-func)update-mood-darkcave)")
         message = ""
     elif effect_name == "nodax" and on_check("nodax"):
+        deactivate("nodax")
         sendForm("(send-event *target* 'sidekick #f)")
         message = ""
     elif effect_name == "lowpoly" and on_check("lowpoly"):
+        deactivate("lowpoly")
         sendForm("(set! (-> *pc-settings* lod-force-tfrag) 0)(set! (-> *pc-settings* lod-force-tie) 0)(set! (-> *pc-settings* lod-force-ocean) 0)(set! (-> *pc-settings* lod-force-actor) 0)")
         message = ""
     elif effect_name == "resetactors" and on_check("resetactors"):
+        deactivate("resetactors")
         sendForm("(reset-actors 'debug)")
         message = ""
     elif effect_name == "widejak" and on_check("widejak"):
+        deactivate("widejak")
         sendForm("(set! (-> (-> (the-as target *target* )root)scale x) 1.0)(set! (-> (-> (the-as target *target* )root)scale y) 1.0)(set! (-> (-> (the-as target *target* )root)scale z) 1.0)")
         message = ""
     elif effect_name == "flatjak" and on_check("flatjak"):
+        deactivate("flatjak")
         sendForm("(set! (-> (-> (the-as target *target* )root)scale x) 1.0)(set! (-> (-> (the-as target *target* )root)scale y) 1.0)(set! (-> (-> (the-as target *target* )root)scale z) 1.0)")
         message = ""
     elif effect_name == "smalljak" and on_check("smalljak"):
+        deactivate("smalljak")
         sendForm("(set! (-> (-> (the-as target *target* )root)scale x) 1.0)(set! (-> (-> (the-as target *target* )root)scale y) 1.0)(set! (-> (-> (the-as target *target* )root)scale z) 1.0)(set! (-> *TARGET-bank* wheel-flip-dist) (meters 17.3))")
         message = ""
     elif effect_name == "bigjak" and on_check("bigjak"):
+        deactivate("bigjak")
         sendForm("(set! (-> (-> (the-as target *target* )root)scale x) 1.0)(set! (-> (-> (the-as target *target* )root)scale y) 1.0)(set! (-> (-> (the-as target *target* )root)scale z) 1.0)")
         message = ""
     elif effect_name == "slippery" and on_check("slippery"):
+        deactivate("slippery")
         sendForm("(set! (-> *stone-surface* slope-slip-angle) 8192.0)(set! (-> *stone-surface* slip-factor) 1.0)(set! (-> *stone-surface* transv-max) 1.0)(set! (-> *stone-surface* turnv) 1.0)(set! (-> *stone-surface* nonlin-fric-dist) 5120.0)(set! (-> *stone-surface* fric) 153600.0)")
         message = ""
     elif effect_name == "rocketman" and on_check("rocketman"):
+        deactivate("rocketman")
         sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters 100.0))(start 'play (get-or-create-continue! *game-info*))")
         message = ""
     elif effect_name == "unzoom" and on_check("unzoom"):
+        deactivate("unzoom")
         sendForm("(send-event *target* 'no-look-around (seconds 0.1))")
         message = ""
     elif effect_name == "bighead" and on_check("bighead"):
+        deactivate("bighead")
         sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats big-head))")
         message = ""
     elif effect_name == "smallhead" and on_check("smallhead"):
+        deactivate("smallhead")
         sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats small-head))")
         message = ""
     elif effect_name == "bigfist" and on_check("bigfist"):
+        deactivate("bigfist")
         sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats big-fist))")
         message = ""
     elif effect_name == "bigheadnpc" and on_check("bigheadnpc"):
+        deactivate("bigheadnpc")
         sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats big-head-npc))")
         message = ""
     elif effect_name == "hugehead" and on_check("hugehead"):
+        deactivate("hugehead")
         sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats huge-head))")
         message = ""
     elif effect_name == "mirror" and on_check("mirror"):
+        deactivate("mirror")
         sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats mirror))")
         message = ""
     elif effect_name == "notex" and on_check("notex"):
+        deactivate("notex")
         sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats no-tex))")
         message = ""
-    elif effect_name == "lang" and on_check("lang"):
-        sendForm("(set! (-> *setting-control* default language) (language-enum english)")
-        message = ""
     elif effect_name == "drown" and on_check("drown"):
+        deactivate("drown")
         sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'drown-death))")
         message = ""
     elif effect_name == "nuka" and on_check("nuka"):
+        deactivate("nuka")
         sendForm("(logiclear! (-> *target* state-flags) (state-flags dying)))")
         message = ""
 
