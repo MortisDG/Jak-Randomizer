@@ -9,6 +9,7 @@ appicon.png
 data/log/compiler.txt
 *.exe
 !gk.exe
+!Randomizer.exe
 !goalc.exe
 !extractor.exe
 resources/data/log/compiler.txt
