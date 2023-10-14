@@ -1,14 +1,15 @@
 # Jak Randomizer
-## Help by barg, Zed and Yopie
+**Help by barg, Zed and Yopie**
 
 Its still Work in Progress.
 
 # Instructions
 1. Download the Release
 2. Extract your .ISO onto the extractor.exe and wait for it to finish
-4. Edit the .env to your liking! (Please use the values specified in the .env to avoid any issues!)
-5. Run the Randomizer.exe
-6. Give a minute to let it rebuild
+3. Edit the .env to your liking! (Please use the values specified in the .env to avoid any issues!)
+4. Run the Randomizer.exe
+5. Give a minute to let it rebuild
+**Video Instructions:** https://youtu.be/ndKJHVLau6o
 
 ## For Streamers.
 If you wanna play this mod, I included 2 files: effect.txt and timer.txt
