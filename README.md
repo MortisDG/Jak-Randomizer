@@ -9,6 +9,7 @@ Its still Work in Progress.
 3. Edit the .env to your liking! (Please use the values specified in the .env to avoid any issues!)
 4. Run the Randomizer.exe
 5. Give a minute to let it rebuild
+
 **Video Instructions:** https://youtu.be/ndKJHVLau6o
 
 ## For Streamers.
