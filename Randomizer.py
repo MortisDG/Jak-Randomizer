@@ -6,6 +6,7 @@ import random
 import struct
 import os
 import shutil
+from dotenv import load_dotenv
 
 # Randomizer made by Mortis
 # Help from: barg, zed & yopie
@@ -203,12 +204,14 @@ effect_mapping = {
     41: "highgrav"
 }
 
-# Number of effects to apply
-num_effects_to_apply = 3
+load_dotenv()
 
-total_duration = 45
+# Number of effects to apply
+num_effects_to_apply = int(os.getenv("num_effects_to_apply"))
+
+total_duration = int(os.getenv("total_duration"))
 start_time = time.time()
-interval = 1 * 45  # 5 minutes
+interval = int(os.getenv("interval"))
 
 def apply_effect(effects):
     random_effect = random.sample(range(1, len(effect_mapping) + 1), effects)

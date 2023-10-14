@@ -1,1 +1,1 @@
-seconds passed: 15.0
+seconds remaining: 21.0
