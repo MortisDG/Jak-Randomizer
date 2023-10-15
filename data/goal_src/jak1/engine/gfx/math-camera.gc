@@ -237,6 +237,9 @@
                 ;; also do mirror game check here.
                 (when (pc-cheats? (-> *pc-settings* cheats) mirror)
                   (*! (-> math-cam perspective vector 0 x) -1.)
+                )
+                (when (pc-cheats? (-> *pc-settings* cheats) mirror-v)
+                  (*! (-> math-cam perspective vector 1 y) -1.)
                   )
                 )
           )

@@ -42,14 +42,14 @@ if launcher_version:
 # Defined list of effects
 command_names = [
     "protect", "rjto", "superjump", "superboosted", "noboosteds","nojumps",
-    "fastjak","slowjak","pacifist","trip",
+    "fastjak","pacifist","trip",
     "shortfall","ghostjak","sucksuck","noeco","die","ouch",
     "burn","drown","endlessfall","iframes",
     "deload","quickcam","dark","nodax","lowpoly",
     "resetactors", "widejak","flatjak","smalljak","bigjak",
     "slippery","rocketman","unzoom","bighead","smallhead","bigfist",
     "bigheadnpc","hugehead","mirror","notex", "flutspeed", "nuka",
-    "highgrav",
+    "highgrav", "lang", "invertcam", "mirror2", "musespeed", "fakecrash"
 ]
 
 # Initialize the current_effect variable
@@ -166,11 +166,11 @@ effect_mapping = {
     4: "noboosteds",
     5: "nojumps",
     6: "fastjak",
-    7: "slowjak",
-    8: "pacifist",
-    9: "trip",
-    10: "shortfall",
-    11: "ghostjak",
+    # 7: "slowjak",
+    7: "pacifist",
+    8: "trip",
+    9: "shortfall",
+    10: "ghostjak",
     11: "flutspeed",
     12: "sucksuck",
     13: "noeco",
@@ -201,7 +201,12 @@ effect_mapping = {
     38: "notex",
     39: "drown",
     40: "nuka",
-    41: "highgrav"
+    41: "highgrav",
+    42: "lang",
+    43: "invertcam",
+    44: "mirror2",
+    45: "musespeed",
+    46: "fakecrash"
 }
 
 load_dotenv()
@@ -280,6 +285,12 @@ def value_changer(cstring):
     elif cstring == "highgrav":
         random_value = random.randint(100, 200)
         command = "(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters {}))(start 'play (get-or-create-continue! *game-info*))".format(random_value)
+    elif cstring == "musespeed":
+        random_value = random.randint(10, 100)
+        command = "(set! (-> *muse-nav-enemy-info* run-travel-speed) (meters {}))".format(random_value)
+    elif cstring == "fakecrash":
+        random_value = random.randint(10, 30)
+        command = "(set! (set-blackout-frames (seconds {}))".format(random_value)
     print(command)
     return command
 
@@ -315,10 +326,10 @@ def execute_activation(effect_name):
         activate("fastjak")
         sendForm("(set! (-> *walk-mods* target-speed) 77777.0)(set! (-> *double-jump-mods* target-speed) 77777.0)(set! (-> *jump-mods* target-speed) 77777.0)(set! (-> *jump-attack-mods* target-speed) 77777.0)(set! (-> *attack-mods* target-speed) 77777.0)(set! (-> *forward-high-jump-mods* target-speed) 77777.0)(set! (-> *jump-attack-mods* target-speed) 77777.0)(set! (-> *stone-surface* target-speed) 1.25)")
         message = ""
-    elif effect_name == "slowjak" and on_check("slowjak"):
-        activate("slowjak")
-        sendForm("(send-event *target* 'reset-pickup 'eco)(set! (-> *walk-mods* target-speed) 20000.0)(set! (-> *double-jump-mods* target-speed) 20000.0)(set! (-> *jump-mods* target-speed) 20000.0)(set! (-> *jump-attack-mods* target-speed) 20000.0)(set! (-> *attack-mods* target-speed) 20000.0)(set! (-> *stone-surface* target-speed) 1.0)(set! (-> *TARGET-bank* wheel-flip-dist) (meters 0))")
-        message = ""
+    # elif effect_name == "slowjak" and on_check("slowjak"):
+    #     activate("slowjak")
+    #     sendForm("(send-event *target* 'reset-pickup 'eco)(set! (-> *walk-mods* target-speed) 20000.0)(set! (-> *double-jump-mods* target-speed) 20000.0)(set! (-> *jump-mods* target-speed) 20000.0)(set! (-> *jump-attack-mods* target-speed) 20000.0)(set! (-> *attack-mods* target-speed) 20000.0)(set! (-> *stone-surface* target-speed) 1.0)(set! (-> *TARGET-bank* wheel-flip-dist) (meters 0))")
+    #     message = ""
     elif effect_name == "pacifist" and on_check("pacifist"):
         activate("pacifist")
         sendForm("(set! (-> *TARGET-bank* punch-radius) (meters -1.0))(set! (-> *TARGET-bank* spin-radius) (meters -1.0))(set! (-> *TARGET-bank* flop-radius) (meters -1.0))(set! (-> *TARGET-bank* uppercut-radius) (meters -1.0))")
@@ -461,6 +472,27 @@ def execute_activation(effect_name):
     elif effect_name == "highgrav" and on_check("highgrav"):
         activate("highgrav")
         sendForm(value_changer("highgrav"))
+    elif effect_name == "musespeed" and on_check("musespeed"):
+        activate("musespeed")
+        sendForm(value_changer("musespeed"))
+        message = ""
+    elif effect_name == "invertcam" and on_check("invertcam"):
+        activate("invertcam")
+        sendForm("(not! (-> *pc-settings* third-camera-h-inverted?))")
+        message = ""
+    elif effect_name == "lang" and on_check("lang"):
+        activate("lang")
+        sendForm("(set! (-> *pc-settings* text-language) (pc-language japanese))")
+        sendForm("(set! (-> *setting-control* default language) (language-enum japanese))")
+        message = ""
+    elif effect_name == "mirror2" and on_check("mirror2"):
+        activate("mirror2")
+        sendForm("(logior! (-> *pc-settings* cheats) (pc-cheats mirror-v))")
+        message = ""
+    elif effect_name ==  "fakecrash" and on_check("fakecrash"):
+        activate("fakecrash")
+        sendForm(value_changer("fakecrash"))
+        message = ""
 
 
 # Deactivate the previous effects
@@ -494,10 +526,10 @@ def execute_deactivation(effect_name):
         deactivate("fastjak")
         sendForm("(set! (-> *walk-mods* target-speed) 40960.0)(set! (-> *double-jump-mods* target-speed) 32768.0)(set! (-> *jump-mods* target-speed) 40960.0)(set! (-> *jump-attack-mods* target-speed) 24576.0)(set! (-> *attack-mods* target-speed) 40960.0)(set! (-> *forward-high-jump-mods* target-speed) 45056.0)(set! (-> *jump-attack-mods* target-speed) 24576.0)(set! (-> *stone-surface* target-speed) 1.0)")
         message = ""
-    elif effect_name == "slowjak" and on_check("slowjak"):
-        deactivate("slowjak")
-        sendForm("(send-event *target* 'reset-pickup 'eco)(set! (-> *walk-mods* target-speed) 20000.0)(set! (-> *double-jump-mods* target-speed) 20000.0)(set! (-> *jump-mods* target-speed) 20000.0)(set! (-> *jump-attack-mods* target-speed) 20000.0)(set! (-> *attack-mods* target-speed) 20000.0)(set! (-> *stone-surface* target-speed) 1.0)(set! (-> *TARGET-bank* wheel-flip-dist) (meters 0))")
-        message = ""
+    # elif effect_name == "slowjak" and on_check("slowjak"):
+    #     deactivate("slowjak")
+    #     sendForm("(send-event *target* 'reset-pickup 'eco)(set! (-> *walk-mods* target-speed) 20000.0)(set! (-> *double-jump-mods* target-speed) 20000.0)(set! (-> *jump-mods* target-speed) 20000.0)(set! (-> *jump-attack-mods* target-speed) 20000.0)(set! (-> *attack-mods* target-speed) 20000.0)(set! (-> *stone-surface* target-speed) 1.0)(set! (-> *TARGET-bank* wheel-flip-dist) (meters 0))")
+    #     message = ""
     elif effect_name == "pacifist" and on_check("pacifist"):
         deactivate("pacifist")
         sendForm("(set! (-> *TARGET-bank* punch-radius) (meters 1.3))(set! (-> *TARGET-bank* spin-radius) (meters 2.2))(set! (-> *TARGET-bank* flop-radius) (meters 1.4))(set! (-> *TARGET-bank* uppercut-radius) (meters 1))")
@@ -526,22 +558,22 @@ def execute_deactivation(effect_name):
         deactivate("noeco")
         sendForm("(set! (-> *FACT-bank* eco-full-timeout) (seconds 20.0))")
         message = ""
-    elif effect_name == "die" and on_check("die"):
-        deactivate("die")
-        sendForm("(when (not (movie?))(initialize! *game-info* 'die (the-as game-save #f) (the-as string #f)))")
-        message = ""
-    elif effect_name == "ouch" and on_check("ouch"):
-        deactivate("ouch")
-        sendForm("(if (not (= *target* #f))(send-event *target* 'attack #t (new 'static 'attack-info)))")
-        message = ""
-    elif effect_name == "burn" and on_check("burn"):
-        deactivate("burn")
-        sendForm("(if (not (= *target* #f))(target-attack-up *target* 'attack 'burnup))")
-        message = ""
-    elif effect_name == "endlessfall" and on_check("endlessfall"):
-        deactivate("endlessfall")
-        sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'endlessfall))")
-        message = ""
+    # elif effect_name == "die" and on_check("die"):
+    #     deactivate("die")
+    #     sendForm("(when (not (movie?))(initialize! *game-info* 'die (the-as game-save #f) (the-as string #f)))")
+    #     message = ""
+    # elif effect_name == "ouch" and on_check("ouch"):
+    #     deactivate("ouch")
+    #     sendForm("(if (not (= *target* #f))(send-event *target* 'attack #t (new 'static 'attack-info)))")
+    #     message = ""
+    # elif effect_name == "burn" and on_check("burn"):
+    #     deactivate("burn")
+    #     sendForm("(if (not (= *target* #f))(target-attack-up *target* 'attack 'burnup))")
+    #     message = ""
+    # elif effect_name == "endlessfall" and on_check("endlessfall"):
+    #     deactivate("endlessfall")
+    #     sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'endlessfall))")
+    #     message = ""
     elif effect_name == "iframes" and on_check("iframes"):
         deactivate("iframes")
         sendForm("(set! (-> *TARGET-bank* hit-invulnerable-timeout) (seconds 0))")
@@ -628,17 +660,33 @@ def execute_deactivation(effect_name):
         deactivate("notex")
         sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats no-tex))")
         message = ""
-    elif effect_name == "drown" and on_check("drown"):
-        deactivate("drown")
-        sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'drown-death))")
-        message = ""
+    # elif effect_name == "drown" and on_check("drown"):
+    #     deactivate("drown")
+    #     sendForm("(when (not (movie?))(target-attack-up *target* 'attack 'drown-death))")
+    #     message = ""
     elif effect_name == "nuka" and on_check("nuka"):
         deactivate("nuka")
-        sendForm("(logiclear! (-> *target* state-flags) (state-flags dying)))")
+        sendForm("(logclear! (-> *target* state-flags) (state-flags dying)))")
         message = ""
     elif effect_name == "highgrav" and on_check("highgrav"):
         deactivate("highgrav")
         sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters 60.0))(start 'play (get-or-create-continue! *game-info*))")
+    elif effect_name == "musespeed" and on_check("musespeed"):
+        deactivate("musespeed")
+        sendForm(value_changer("musespeed"))
+        message = ""
+    elif effect_name == "lang" and on_check("lang"):
+        deactivate("lang")
+        sendForm("(set! (-> *pc-settings* text-language) (pc-language english))")
+        sendForm("(set! (-> *setting-control* default language) (language-enum english))")
+    elif effect_name == "invertcam" and on_check("invertcam"):
+        deactivate("invertcam")
+        sendForm("(not! (-> *pc-settings* third-camera-h-inverted?))")
+        message = ""
+    elif effect_name == "mirror2" and on_check("mirror2"):
+        deactivate("mirror2")
+        sendForm("(logclear! (-> *pc-settings* cheats) (pc-cheats mirror-v))")
+        message = ""
 
 
 while True:

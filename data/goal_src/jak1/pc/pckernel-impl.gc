@@ -42,6 +42,7 @@
   (huge-head)
   (big-head-npc)
   (oh-my-goodness)
+  (mirror-v)
   )
   
 ;; pc enum for languages. this is the game's languages + custom ones.

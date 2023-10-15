@@ -355,7 +355,12 @@
                   (when (pc-cheats? (-> *pc-settings* cheats) mirror)
                       (set! (-> pad leftx) (- 255 (-> pad leftx)))
                       (set! (-> pad rightx) (- 255 (-> pad rightx)))
-                      ))
+                      )
+                  (when (pc-cheats? (-> *pc-settings* cheats) mirror-v)
+                      (set! (-> pad lefty) (- 255 (-> pad lefty)))
+                      (set! (-> pad righty) (- 255 (-> pad righty)))
+                      )
+                      )
               ;; compute speed and direction, with deadband.
               (let ((f30-0 (* 0.0078125 (the float (+ (-> pad leftx) -128))))
                     (f28-0 (* 0.0078125 (the float (- 127 (the-as int (-> pad lefty))))))

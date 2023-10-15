@@ -168,6 +168,7 @@
   (if (pc-cheats? (-> obj cheats) mirror)
       (sound-set-mirror-mode (sound-mirror-mode mirrored))
       (sound-set-mirror-mode (sound-mirror-mode normal)))
+  ;; nothing for cheat mirror-v
 
   ;; run cheats end!!!
   ;;;;;;;;;;;;;;;;;;;;

@@ -1,3 +1,3 @@
-current effect:superjumpcurrent effect: bighead
-current effect: drown
-current effect: slowjak
+current effect: noboosteds
+current effect: ouch
+current effect: notex
