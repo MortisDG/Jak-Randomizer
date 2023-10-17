@@ -237,9 +237,9 @@ def apply_effect(effects):
             # Write new effects in "effect.txt" and replace the old ones
             with open("effect.txt", "r") as file:
                 lines = file.readlines()
-            lines.append("current effect: " + effect_name + "\n")
-            if len(lines) > 3:
-                lines = lines[-3:]
+                lines.append("current effect: " + effect_name + "\n")
+            if len(lines) > num_effects_to_apply:
+                lines = lines[-num_effects_to_apply:]
             with open("effect.txt", "w") as file:
                 file.writelines(lines)
             # Activate new effect(s)
@@ -290,7 +290,7 @@ def value_changer(cstring):
         command = "(set! (-> *muse-nav-enemy-info* run-travel-speed) (meters {}))".format(random_value)
     elif cstring == "fakecrash":
         random_value = random.randint(10, 30)
-        command = "(set! (set-blackout-frames (seconds {}))".format(random_value)
+        command = "(set-blackout-frames (seconds {}))".format(random_value)
     print(command)
     return command
 
