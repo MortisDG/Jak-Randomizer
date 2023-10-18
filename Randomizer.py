@@ -575,7 +575,7 @@ def execute_deactivation(effect_name):
     #     message = ""
     elif effect_name == "iframes" and on_check("iframes"):
         deactivate("iframes")
-        sendForm("(set! (-> *TARGET-bank* hit-invulnerable-timeout) (seconds 0))")
+        sendForm("(set! (-> *TARGET-bank* hit-invulnerable-timeout) (seconds 3))")
     #     message = ""
     # elif effect_name == "deload" and on_check("deload"):
     #     deactivate("deload")
