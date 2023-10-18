@@ -550,8 +550,8 @@ def execute_deactivation(effect_name):
         message = ""
     elif effect_name == "sucksuck" and on_check("sucksuck"):
         deactivate("sucksuck")
-        sendForm("(set! (-> *FACT-bank* suck-suck-dist) (meters 5.0)")
-        sendForm("(set! (-> *FACT-bank* suck-bounce-dist) (meters 5.0)")
+        sendForm("(set! (-> *FACT-bank* suck-suck-dist) (meters 7.5)")
+        sendForm("(set! (-> *FACT-bank* suck-bounce-dist) (meters 18.0)")
         message = ""
     elif effect_name == "noeco" and on_check("noeco"):
         deactivate("noeco")
