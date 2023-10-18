@@ -49,7 +49,7 @@ command_names = [
     "resetactors", "widejak","flatjak","smalljak","bigjak",
     "slippery","rocketman","unzoom","bighead","smallhead","bigfist",
     "bigheadnpc","hugehead","mirror","notex", "flutspeed", "nuka",
-    "highgrav", "lang", "invertcam", "mirror2", "musespeed", "fakecrash"
+    "highgrav", "lang", "invertcam", "mirror2", "fakecrash"
 ]
 
 # Initialize the current_effect variable
@@ -205,8 +205,7 @@ effect_mapping = {
     42: "lang",
     43: "invertcam",
     44: "mirror2",
-    45: "musespeed",
-    46: "fakecrash"
+    45: "fakecrash"
 }
 
 load_dotenv()
@@ -285,9 +284,9 @@ def value_changer(cstring):
     elif cstring == "highgrav":
         random_value = random.randint(100, 200)
         command = "(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters {}))(start 'play (get-or-create-continue! *game-info*))".format(random_value)
-    elif cstring == "musespeed":
-        random_value = random.randint(10, 100)
-        command = "(set! (-> *muse-nav-enemy-info* run-travel-speed) (meters {}))".format(random_value)
+    # elif cstring == "musespeed":
+    #     random_value = random.randint(10, 100)
+    #     command = "(when (process-by-ename 'muse-2' (set! (-> *muse-nav-enemy-info* run-travel-speed) (meters {}))))".format(random_value)
     elif cstring == "fakecrash":
         random_value = random.randint(10, 30)
         command = "(set-blackout-frames (seconds {}))".format(random_value)
@@ -472,10 +471,10 @@ def execute_activation(effect_name):
     elif effect_name == "highgrav" and on_check("highgrav"):
         activate("highgrav")
         sendForm(value_changer("highgrav"))
-    elif effect_name == "musespeed" and on_check("musespeed"):
-        activate("musespeed")
-        sendForm(value_changer("musespeed"))
-        message = ""
+    # elif effect_name == "musespeed" and on_check("musespeed"):
+    #     activate("musespeed")
+    #     sendForm(value_changer("musespeed"))
+    #     message = ""
     elif effect_name == "invertcam" and on_check("invertcam"):
         activate("invertcam")
         sendForm("(not! (-> *pc-settings* third-camera-h-inverted?))")
@@ -671,10 +670,10 @@ def execute_deactivation(effect_name):
     elif effect_name == "highgrav" and on_check("highgrav"):
         deactivate("highgrav")
         sendForm("(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters 60.0))(start 'play (get-or-create-continue! *game-info*))")
-    elif effect_name == "musespeed" and on_check("musespeed"):
-        deactivate("musespeed")
-        sendForm(value_changer("musespeed"))
-        message = ""
+    # elif effect_name == "musespeed" and on_check("musespeed"):
+    #     deactivate("musespeed")
+    #     sendForm("when (process-by-ename 'muse-2' (set! *muse-nav-enemy-info* run-travel-speed (meters 10))")
+    #     message = ""
     elif effect_name == "lang" and on_check("lang"):
         deactivate("lang")
         sendForm("(set! (-> *pc-settings* text-language) (pc-language english))")
