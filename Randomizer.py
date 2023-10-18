@@ -44,8 +44,7 @@ command_names = [
     "protect", "rjto", "superjump", "superboosted", "noboosteds","nojumps",
     "fastjak","pacifist","trip",
     "shortfall","ghostjak","sucksuck","noeco","die","ouch",
-    "burn","drown","endlessfall","iframes",
-    "deload","quickcam","dark","nodax","lowpoly",
+    "burn","drown","endlessfall","iframes","quickcam","dark","nodax","lowpoly",
     "resetactors", "widejak","flatjak","smalljak","bigjak",
     "slippery","rocketman","unzoom","bighead","smallhead","bigfist",
     "bigheadnpc","hugehead","mirror","notex", "flutspeed", "nuka",
@@ -179,7 +178,7 @@ effect_mapping = {
     16: "burn",
     17: "endlessfall",
     18: "iframes",
-    19: "deload",
+    # 19: "deload",
     20: "quickcam",
     21: "dark",
     22: "nodax",
@@ -251,7 +250,7 @@ def value_changer(cstring):
     #this requires calling value_changer once per line of goal we send
     if cstring == "rjto":
         # Generate a random value between 1 - 100
-        random_value = random.randint(1, 100)
+        random_value = random.randint(1, 200)
         # Create new command with random value
         command = "(set! (-> *TARGET-bank* wheel-flip-dist) (meters {}))".format(random_value)
     elif cstring == "jump1":
@@ -282,7 +281,7 @@ def value_changer(cstring):
         random_value = random.randint(1, 120)
         command = "(send-event *target* 'no-look-around (seconds {}))".format(random_value)
     elif cstring == "highgrav":
-        random_value = random.randint(100, 200)
+        random_value = random.randint(100, 500)
         command = "(stop 'debug)(set! (-> *standard-dynamics* gravity-length) (meters {}))(start 'play (get-or-create-continue! *game-info*))".format(random_value)
     # elif cstring == "musespeed":
     #     random_value = random.randint(10, 100)
@@ -378,10 +377,10 @@ def execute_activation(effect_name):
         activate("iframes")
         sendForm(value_changer("iframes"))
         message = ""
-    elif effect_name == "deload" and on_check("deload"):
-        activate("deload")
-        sendForm("(when (not (movie?))(set! (-> *load-state* want 0 display?) #f))")
-        message = ""
+    # elif effect_name == "deload" and on_check("deload"):
+    #     activate("deload")
+    #     sendForm("(when (not (movie?))(set! (-> *load-state* want 0 display?) #f))")
+    #     message = ""
     elif effect_name == "quickcam" and on_check("quickcam"):
         activate("quickcam")
         sendForm("(stop 'debug)(start 'play (get-or-create-continue! *game-info*))")
@@ -576,7 +575,7 @@ def execute_deactivation(effect_name):
     elif effect_name == "iframes" and on_check("iframes"):
         deactivate("iframes")
         sendForm("(set! (-> *TARGET-bank* hit-invulnerable-timeout) (seconds 3))")
-    #     message = ""
+        message = ""
     # elif effect_name == "deload" and on_check("deload"):
     #     deactivate("deload")
     #     sendForm("(when (not (movie?))(set! (-> *load-state* want 0 display?) #f))")
