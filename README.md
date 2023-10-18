@@ -20,3 +20,6 @@ This will add the current effects and a timer (Remaining Time until new effect) 
 If there are any bugs or something else, let me know!
 
 # Windows Defender might flag it as a Virus, just allow it on your PC and you're good to go!
+
+# Effects:
+rjto, superjump, superboosted, noboosteds, nojumps, fastjak, pacifist, trip, shortfall, ghostjak, flutspeed, sucksuck, noeco, die ouch, burn, endlessfall, iframes, deload, quickcam, dark, nodax, lowpoly, resetactors, widejak, flatjak, smalljak, bigjak, slippery, rocketman, unzoom, bighead, smallhead, bigfist, bigheadnpc, hugehead, mirror, notex, drown, nuka, highgrav, lang, invertcam, mirror2, fakecrash
