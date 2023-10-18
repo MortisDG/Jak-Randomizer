@@ -576,11 +576,11 @@ def execute_deactivation(effect_name):
     elif effect_name == "iframes" and on_check("iframes"):
         deactivate("iframes")
         sendForm("(set! (-> *TARGET-bank* hit-invulnerable-timeout) (seconds 0))")
-        message = ""
-    elif effect_name == "deload" and on_check("deload"):
-        deactivate("deload")
-        sendForm("(when (not (movie?))(set! (-> *load-state* want 0 display?) #f))")
-        message = ""
+    #     message = ""
+    # elif effect_name == "deload" and on_check("deload"):
+    #     deactivate("deload")
+    #     sendForm("(when (not (movie?))(set! (-> *load-state* want 0 display?) #f))")
+    #     message = ""
     elif effect_name == "quickcam" and on_check("quickcam"):
         deactivate("quickcam")
         sendForm("(stop 'debug)(start 'play (get-or-create-continue! *game-info*))")
