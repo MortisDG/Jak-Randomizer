@@ -1,1 +1,1 @@
-seconds remaining: 10.0
+seconds remaining:
